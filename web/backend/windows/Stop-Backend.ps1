@@ -1,7 +1,8 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$tunnelPidFile = Join-Path $root 'tunnel.pid'
-if (Test-Path -LiteralPath $tunnelPidFile) { $savedPid = [int](Get-Content -LiteralPath $tunnelPidFile -Raw); Stop-Process -Id $savedPid -Force -ErrorAction SilentlyContinue; Remove-Item -LiteralPath $tunnelPidFile -Force }
+foreach ($name in @('MultiMP3 Tunnel','MultiMP3 Backend')) { Stop-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue }
+$tunnels = Get-Process -Name cloudflared -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq (Join-Path $root 'cloudflared.exe') }
+if ($tunnels) { $tunnels | Stop-Process -Force -ErrorAction SilentlyContinue }
 $listener = Get-NetTCPConnection -LocalPort 4783 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($listener) { Stop-Process -Id $listener.OwningProcess -Force -ErrorAction SilentlyContinue }
 Remove-Item -LiteralPath (Join-Path $root 'backend.pid') -Force -ErrorAction SilentlyContinue
