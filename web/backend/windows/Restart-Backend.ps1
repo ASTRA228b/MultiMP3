@@ -3,7 +3,15 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $controlLog = Join-Path $root 'Backend Control.log'
 function Write-Log($message) { $line = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] RESTART: $message"; Add-Content -LiteralPath $controlLog -Value $line; Write-Host $line }
 trap { Write-Log "ERROR: $($_.Exception.Message)"; exit 1 }
-function Invoke-Git([string[]]$Arguments) { $output = & git @Arguments 2>&1; $code = $LASTEXITCODE; foreach ($line in $output) { Write-Log "git: $line" }; if ($code -ne 0) { throw "git $($Arguments -join ' ') failed with exit code $code." } }
+function Invoke-Git([string[]]$Arguments) {
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    $output = & git @Arguments 2>&1
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $previousPreference
+    foreach ($line in $output) { Write-Log "git: $line" }
+    if ($code -ne 0) { throw "git $($Arguments -join ' ') failed with exit code $code." }
+}
 Write-Log 'Restart requested.'
 & (Join-Path $root 'Stop-Backend.ps1'); if (-not $?) { throw 'Stop step failed.' }
 & (Join-Path $root 'Start-Backend.ps1'); if (-not $?) { throw 'Start step failed.' }
