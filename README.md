@@ -20,7 +20,7 @@ npm install
 npm start
 ```
 
-Then serve `web/static` with any static HTTP server; it automatically connects to `http://127.0.0.1:4783`. On Windows, the packaged backend folder includes Start, Stop, and Restart command files. Set `MULTIMP3_ALLOWED_ORIGINS` to the final site origin before using the public frontend. See [`web/backend/.env.example`](web/backend/.env.example).
+Then serve `web/static` with any static HTTP server; it automatically connects to `http://127.0.0.1:4783`. On Windows, the packaged backend folder includes Start, Stop, and Restart command files. Copy `Public Site URL.example.txt` to `Public Site URL.txt`, replace its contents with the exact deployed Vercel origin, and restart the backend. The local file is ignored by Git. See [`web/backend/.env.example`](web/backend/.env.example).
 
 API routes:
 
