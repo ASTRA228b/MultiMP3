@@ -5,8 +5,8 @@ function Write-Log($message) { $line = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss
 trap { Write-Log "ERROR: $($_.Exception.Message)"; exit 1 }
 function Invoke-Git([string[]]$Arguments) { $output = & git @Arguments 2>&1; $code = $LASTEXITCODE; foreach ($line in $output) { Write-Log "git: $line" }; if ($code -ne 0) { throw "git $($Arguments -join ' ') failed with exit code $code." } }
 Write-Log 'Restart requested.'
-& (Join-Path $root 'Stop-Backend.ps1'); if ($LASTEXITCODE -ne 0) { throw 'Stop step failed.' }
-& (Join-Path $root 'Start-Backend.ps1'); if ($LASTEXITCODE -ne 0) { throw 'Start step failed.' }
+& (Join-Path $root 'Stop-Backend.ps1'); if (-not $?) { throw 'Stop step failed.' }
+& (Join-Path $root 'Start-Backend.ps1'); if (-not $?) { throw 'Start step failed.' }
 $tunnelUrl = (Get-Content -LiteralPath (Join-Path $root 'Tunnel URL.txt') -Raw).Trim()
 $repoCandidate = Join-Path $root '..\..\..'
 if (Test-Path -LiteralPath (Join-Path $repoCandidate '.git')) { $repo = (Resolve-Path $repoCandidate).Path }
