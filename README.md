@@ -31,6 +31,8 @@ API routes:
 | `POST /api/download` | Convert and return one MP3 |
 | `POST /api/export` | Build an album ZIP or `MultiMP3_Site_Albums.zip` |
 
+The public API is available at `https://multimp3.vercel.app/api`. It supports credential-free cross-origin requests from browser applications as well as command-line and server-side clients. See [the public API guide](docs/PUBLIC-API.md) for payloads and examples in several programming languages.
+
 The Vercel frontend does not process media by itself. The included service runs locally on the user's Windows computer; visitors without it can still view and organize the interface, but metadata and downloads remain unavailable. Temporary media is not retained after delivery.
 
 ## Overview
