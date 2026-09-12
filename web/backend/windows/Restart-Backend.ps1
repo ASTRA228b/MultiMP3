@@ -22,7 +22,8 @@ else { $repoFile = Join-Path $root 'Repository Path.txt'; if (-not (Test-Path -L
 $vercelFile = Join-Path $repo 'web\vercel.json'
 $config = Get-Content -LiteralPath $vercelFile -Raw | ConvertFrom-Json
 $config.rewrites[0].destination = "$tunnelUrl/api/:path*"
-$config | ConvertTo-Json -Depth 10 -Compress | Set-Content -LiteralPath $vercelFile -Encoding utf8
+$json = $config | ConvertTo-Json -Depth 10 -Compress
+[IO.File]::WriteAllText($vercelFile, $json, (New-Object Text.UTF8Encoding($false)))
 Write-Log "Updated Vercel proxy target to $tunnelUrl."
 Push-Location $repo
 try {
@@ -32,4 +33,9 @@ try {
     if ($LASTEXITCODE -ne 0) { Invoke-Git @('commit','-m','Update public backend tunnel URL'); Invoke-Git @('push','origin','HEAD'); Write-Log 'Pushed the new tunnel proxy to ASTRA228b/MultiMP3.' }
     else { Write-Log 'Tunnel proxy was already current; no push needed.' }
 } finally { Pop-Location }
+Write-Log 'Waiting for the Vercel production proxy to become healthy.'
+$vercelReady = $false
+foreach ($attempt in 1..36) { try { $published = Invoke-RestMethod -Uri 'https://multimp3.vercel.app/api/health' -TimeoutSec 15; if ($published.ok -eq $true) { $vercelReady = $true; break } } catch {}; Start-Sleep -Seconds 5 }
+if (-not $vercelReady) { throw 'GitHub was updated, but the Vercel /api/health route did not become healthy within three minutes. Check the Vercel deployment log.' }
+Write-Log 'Vercel public health check passed.'
 Write-Log 'SUCCESS: restart, verification, and GitHub update completed.'
