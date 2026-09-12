@@ -3,11 +3,11 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $healthUrl = 'http://127.0.0.1:4783/api/health'
 function Test-Backend { return $null -ne (Get-NetTCPConnection -LocalPort 4783 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1) }
 function Install-Worker($name, $file) {
-    $action = New-ScheduledTaskAction -Execute 'cmd.exe' -Argument "/c `"`"$file`"`"" -WorkingDirectory $root
+    $escapedFile = $file.Replace("'", "''")
+    $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -Command `"& '$escapedFile'`"" -WorkingDirectory $root
     $trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddYears(1))
-    $principal = New-ScheduledTaskPrincipal -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType S4U -RunLevel Limited
     $settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
-    Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description 'MultiMP3 machine-managed background service' -Force | Out-Null
+    Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -Settings $settings -Description 'MultiMP3 machine-managed background service' -Force | Out-Null
     Start-ScheduledTask -TaskName $name
 }
 if (-not (Test-Backend)) {

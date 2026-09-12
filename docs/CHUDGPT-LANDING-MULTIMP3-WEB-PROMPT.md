@@ -7,9 +7,10 @@ Use these verified ChudGPT routes:
 - Main site: `https://chudgpt-landing.vercel.app/`
 - Apps directory: `https://chudgpt-landing.vercel.app/apps`
 - Existing MultiMP3 page: `https://chudgpt-landing.vercel.app/apps/multimp3`
+- MultiMP3 Web: `https://multimp3.vercel.app`
 - Public source: `https://github.com/ASTRA228b/MultiMP3`
 
-Add the separately deployed MultiMP3 Web URL only after it is known. Do not invent it. Store it as a configurable constant or environment value named `MULTIMP3_WEB_URL` if the landing project already uses environment configuration.
+Use `https://multimp3.vercel.app` for every “Open MultiMP3 Web” action. Store it as a configurable constant named `MULTIMP3_WEB_URL` if the landing project centralizes external application URLs.
 
 Present the product identity as “MultiMP3” with “A ChudGPT App” as the secondary label. Explain that MultiMP3 now has two editions:
 
@@ -29,7 +30,7 @@ The processing backend route map is:
 - `POST /api/download` — convert and return one permitted track
 - `POST /api/export` — create one album ZIP or `MultiMP3_Site_Albums.zip`
 
-Do not publish a private backend address. If a public HTTPS processing service exists, configure it through the MultiMP3 Web UI or deployment configuration and restrict `MULTIMP3_ALLOWED_ORIGINS` to the final web-site origin.
+Do not publish, display, or hardcode the temporary TryCloudflare backend address in the ChudGPT landing site. MultiMP3 Web already contains its processing-service connection. The machine-managed backend restricts browser access to `https://multimp3.vercel.app` and its temporary tunnel address can change after a backend restart.
 
 Include the responsible-use note: users should download only media they own, have permission to download, or are otherwise legally allowed to save. Do not claim DRM, private-video, authentication, regional-restriction, or paywall bypass.
 
