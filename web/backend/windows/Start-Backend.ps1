@@ -5,7 +5,9 @@ function Test-Backend { return $null -ne (Get-NetTCPConnection -LocalPort 4783 -
 function Install-Worker($name, $file) {
     $action = New-ScheduledTaskAction -Execute 'cmd.exe' -Argument "/c `"`"$file`"`"" -WorkingDirectory $root
     $trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddYears(1))
-    Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -Description 'MultiMP3 machine-managed service' -Force | Out-Null
+    $principal = New-ScheduledTaskPrincipal -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType S4U -RunLevel Limited
+    $settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero)
+    Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -Principal $principal -Settings $settings -Description 'MultiMP3 machine-managed background service' -Force | Out-Null
     Start-ScheduledTask -TaskName $name
 }
 if (-not (Test-Backend)) {
