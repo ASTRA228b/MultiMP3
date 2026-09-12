@@ -3,6 +3,7 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $healthUrl = 'http://127.0.0.1:4783/api/health'
 function Test-Health { try { return (Invoke-RestMethod -Uri $healthUrl -TimeoutSec 2).ok -eq $true } catch { return $false } }
 if (-not (Test-Health)) {
+    Remove-Item -LiteralPath (Join-Path $root 'backend.pid') -Force -ErrorAction SilentlyContinue
     $env:YT_DLP_PATH = Join-Path $root 'tools\yt-dlp.exe'
     $env:FFMPEG_PATH = Join-Path $root 'tools\ffmpeg.exe'
     $env:MULTIMP3_HOST = '127.0.0.1'; $env:MULTIMP3_PORT = '4783'
