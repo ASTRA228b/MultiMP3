@@ -49,6 +49,7 @@ Desktop.ini
 .vercel/
 node_modules/
 backend.log
+Backend Control.log
 backend.pid
 tunnel.log
 tunnel.pid
