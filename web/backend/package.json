@@ -1,0 +1,1 @@
+{"name":"multimp3-processing-service","version":"1.3.0","private":true,"description":"Local processing backend for MultiMP3 Web","main":"server.js","scripts":{"start":"node server.js","check":"node --check server.js"},"dependencies":{"archiver":"7.0.1","cors":"2.8.5","express":"5.2.1","express-rate-limit":"7.5.0"}}

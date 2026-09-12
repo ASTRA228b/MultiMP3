@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — MultiMP3 Web
+
+- Added a responsive ChudGPT-themed web interface under `web/static` with multi-link queueing, quality selection, albums, local state, individual downloads, album ZIPs, and full-library export.
+- Added a local Node processing service under `web/backend` with validated YouTube metadata, yt-dlp/FFmpeg conversion, archive generation, request limits, filename safety, and temporary-file cleanup.
+- Added Windows Start, Stop, and Restart controls for the processing service and Vercel-ready static configuration.
+- Documented the static-hosting boundary, local operation, API routes, and responsible-use requirements.
+
 ## v1.3.0 — First public release
 
 The first public release retains the existing application's 1.3.0 version.

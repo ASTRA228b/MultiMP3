@@ -6,6 +6,33 @@
 
 Version **1.3.0** · Windows x64 · MIT source license
 
+## MultiMP3 Web
+
+MultiMP3 Web is the fast browser edition: paste one or many supported YouTube links, inspect metadata, choose MP3 quality, organize tracks into albums, download a track or album, and export the full library as `MultiMP3_Site_Albums.zip`. Its responsive frontend lives in `web/static`; lightweight queue, album, and quality state stays in browser storage.
+
+The static interface is designed for a separate Vercel project. Media processing cannot run on static hosting: `web/backend` provides the companion Node service for metadata, yt-dlp extraction, FFmpeg conversion, and ZIP creation. The web app connects to the installed local service automatically and does not expose backend configuration to visitors. The backend validates YouTube URLs, sanitizes names, limits requests and archive sizes, bounds processing to one conversion at a time, and cleans temporary files after responses finish.
+
+To run locally, install Node.js 20+, yt-dlp, FFmpeg, and the backend dependencies:
+
+```powershell
+cd web/backend
+npm install
+npm start
+```
+
+Then serve `web/static` with any static HTTP server; it automatically connects to `http://127.0.0.1:4783`. On Windows, the packaged backend folder includes Start, Stop, and Restart command files. Set `MULTIMP3_ALLOWED_ORIGINS` to the final site origin before using the public frontend. See [`web/backend/.env.example`](web/backend/.env.example).
+
+API routes:
+
+| Route | Purpose |
+| --- | --- |
+| `GET /api/health` | Verify the service, yt-dlp, and FFmpeg |
+| `POST /api/info` | Read metadata for 1–50 validated YouTube URLs |
+| `POST /api/download` | Convert and return one MP3 |
+| `POST /api/export` | Build an album ZIP or `MultiMP3_Site_Albums.zip` |
+
+The Vercel frontend does not process media by itself. The included service runs locally on the user's Windows computer; visitors without it can still view and organize the interface, but metadata and downloads remain unavailable. Temporary media is not retained after delivery.
+
 ## Overview
 
 Paste supported YouTube links, import an album or playlist, choose audio quality, and manage your queue in one place. MultiMP3 also organizes purchased MP3 files already downloaded to your computer. No account is required by the app.
@@ -112,6 +139,8 @@ UI test/preview harnesses require `-p:EnableUiTests=true` and isolated data dire
 | `tests` | Executable regression checks, including real FFmpeg fixtures |
 | `scripts` | Build, package, upstream tool setup, and shortcut creation |
 | `assets`, `docs/images` | MultiMP3 branding and sample-data screenshots |
+| `web/static` | Deployable MultiMP3 Web interface |
+| `web/backend` | Local processing API and Windows service controls |
 
 ## Known Issues
 
