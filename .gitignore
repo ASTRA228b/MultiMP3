@@ -48,6 +48,10 @@ Thumbs.db
 Desktop.ini
 .vercel/
 node_modules/
-backend.pid
 backend.log
+backend.pid
+tunnel.log
+tunnel.pid
+Tunnel URL.txt
 Public Site URL.txt
+Repository Path.txt

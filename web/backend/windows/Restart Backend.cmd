@@ -1,3 +1,4 @@
 @echo off
-call "%~dp0Stop Backend.cmd"
-call "%~dp0Start Backend.cmd"
+setlocal
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Restart-Backend.ps1"
+exit /b %errorlevel%

@@ -1,0 +1,1 @@
+Paste the absolute path to your local MultiMP3 Git repository here, then rename this file to Repository Path.txt.
