@@ -21,10 +21,11 @@ if (-not (Test-Backend)) {
 $health = Invoke-RestMethod -Uri 'http://127.0.0.1:4783/api/health' -TimeoutSec 30
 if ($health.ok -ne $true) { throw 'The local health check did not report success.' }
 Write-Log "Local backend health passed (version $($health.version))."
-Stop-ScheduledTask -TaskName 'MultiMP3 Tunnel' -ErrorAction SilentlyContinue
+& (Join-Path $root 'Stop-Tunnel.ps1')
 Start-Sleep -Seconds 2
 $tunnelLog = Join-Path $root 'tunnel.log'
-Remove-Item -LiteralPath $tunnelLog -Force -ErrorAction SilentlyContinue
+if (Test-Path -LiteralPath $tunnelLog) { Remove-Item -LiteralPath $tunnelLog -Force -ErrorAction Stop }
+Remove-Item -LiteralPath (Join-Path $root 'Tunnel URL.txt') -Force -ErrorAction SilentlyContinue
 Install-Worker 'MultiMP3 Tunnel' (Join-Path $root 'Run-Tunnel-Hidden.vbs')
 $tunnelUrl = $null
 foreach ($attempt in 1..60) {
@@ -34,7 +35,8 @@ foreach ($attempt in 1..60) {
 if (-not $tunnelUrl) { throw 'TryCloudflare did not provide a public URL within 60 seconds.' }
 Write-Log "Tunnel assigned $tunnelUrl; waiting for public health."
 $publicReady = $false
-foreach ($attempt in 1..45) { try { $remote = Invoke-RestMethod -Uri "$tunnelUrl/api/health" -TimeoutSec 10; if ($remote.ok -eq $true) { $publicReady = $true; break } } catch {}; Start-Sleep -Seconds 2 }
-if (-not $publicReady) { throw "Public health check failed for $tunnelUrl." }
+$lastHealthError = 'No healthy MultiMP3 response.'
+foreach ($attempt in 1..45) { try { $remote = Invoke-RestMethod -Uri "$tunnelUrl/api/health" -TimeoutSec 10; if ($remote.ok -eq $true -and $remote.service -eq 'MultiMP3') { $publicReady = $true; break } } catch { $lastHealthError = $_.Exception.Message }; Start-Sleep -Seconds 2 }
+if (-not $publicReady) { throw "Public health check failed for $tunnelUrl. Last error: $lastHealthError. Tunnel log: $tunnelLog" }
 Set-Content -LiteralPath (Join-Path $root 'Tunnel URL.txt') -Value $tunnelUrl -Encoding ascii
 Write-Log "SUCCESS: backend and public tunnel are healthy at $tunnelUrl."
