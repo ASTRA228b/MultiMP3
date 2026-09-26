@@ -10,4 +10,4 @@ if exist "Public Site URL.txt" (
   set /p MULTIMP3_PUBLIC_ORIGIN=<"Public Site URL.txt"
   call set "MULTIMP3_ALLOWED_ORIGINS=%%MULTIMP3_ALLOWED_ORIGINS%%,%%MULTIMP3_PUBLIC_ORIGIN%%"
 )
-"%CD%\node.exe" "%CD%\server.js"
+"%CD%\node.exe" "%CD%\server.js" >> "%CD%\backend.out.log" 2>> "%CD%\backend.err.log"

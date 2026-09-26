@@ -18,8 +18,23 @@ if (-not (Test-Backend)) {
     foreach ($attempt in 1..60) { Start-Sleep -Seconds 1; if (Test-Backend) { break } }
     if (-not (Test-Backend)) { throw 'The backend did not open port 4783 within 60 seconds.' }
 } else { Write-Log 'Backend was already listening on port 4783.' }
-$health = Invoke-RestMethod -Uri 'http://127.0.0.1:4783/api/health' -TimeoutSec 30
-if ($health.ok -ne $true) { throw 'The local health check did not report success.' }
+$health = $null
+$lastHealthError = 'No healthy response received.'
+$healthDeadline = (Get-Date).AddSeconds(120)
+do {
+    try {
+        $candidate = Invoke-RestMethod -Uri 'http://127.0.0.1:4783/api/health' -TimeoutSec 15
+        if ($candidate.ok -eq $true -and $candidate.service -eq 'MultiMP3') { $health = $candidate; break }
+        $lastHealthError = 'Response did not identify a healthy MultiMP3 backend.'
+    } catch {
+        $lastHealthError = $_.Exception.Message
+        if ($_.ErrorDetails.Message) { $lastHealthError += ' ' + $_.ErrorDetails.Message }
+    }
+    Write-Log "Local health pending: $lastHealthError"
+    Start-Sleep -Seconds 2
+} while ((Get-Date) -lt $healthDeadline)
+if (-not $health) { throw "Local readiness failed after 120 seconds: $lastHealthError. See backend.err.log." }
+
 Write-Log "Local backend health passed (version $($health.version))."
 & (Join-Path $root 'Stop-Tunnel.ps1')
 Start-Sleep -Seconds 2
