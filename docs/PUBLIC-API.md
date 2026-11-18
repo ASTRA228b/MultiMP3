@@ -2,7 +2,7 @@
 
 Base URL: `https://multimp3.vercel.app/api`
 
-The API accepts credential-free requests from browser, command-line, and server-side clients. Browser CORS is enabled for every origin. The service currently limits clients to 40 requests per minute. Use it only for media you own, have permission to download, or are otherwise legally allowed to save.
+Remote processing is disabled by default. A private deployment must explicitly set `MULTIMP3_ENABLE_PROCESSING=true`, provide a random `MULTIMP3_API_TOKEN` of at least 32 characters, and optionally configure a comma-separated `MULTIMP3_ALLOWED_ORIGINS` allowlist. Protected requests use `Authorization: Bearer YOUR_TOKEN`. The service limits clients to 30 requests per minute. Use it only for media you own, have permission to download, or are otherwise legally allowed to save.
 
 ## Endpoints
 
@@ -13,7 +13,7 @@ The API accepts credential-free requests from browser, command-line, and server-
 | `POST` | `/download` | `url`, optional `title`, and optional `quality` | `audio/mpeg` MP3 attachment |
 | `POST` | `/export` | `albums`, optional `quality`, and optional `filename` | ZIP attachment |
 
-Supported quality values are `128`, `192`, `256`, `320`, and `best`. Export requests may contain 1–50 albums and 1–250 total tracks. URL fields must use HTTPS and a supported YouTube host. Errors return JSON with an `error` string. Downloads can take time because extraction and conversion happen on demand.
+Supported quality values are `128`, `192`, `256`, `320`, and `best`. Info requests accept at most 20 URLs. Export requests may contain 1–20 albums and 1–100 total tracks. URL fields must use HTTPS and a supported YouTube host. Errors return JSON with an `error` string. Downloads can take time because extraction and conversion happen on demand.
 
 ## Quick examples
 
@@ -23,7 +23,7 @@ Replace `VIDEO_ID` with a supported public media identifier.
 
 ```bash
 curl https://multimp3.vercel.app/api/health
-curl -L -o "Example Track.mp3" -H "Content-Type: application/json" -d '{"url":"https://www.youtube.com/watch?v=VIDEO_ID","title":"Example Track","quality":"192"}' https://multimp3.vercel.app/api/download
+curl -L -o "Example Track.mp3" -H "Authorization: Bearer YOUR_TOKEN" -H "Content-Type: application/json" -d '{"url":"https://www.youtube.com/watch?v=VIDEO_ID","title":"Example Track","quality":"192"}' https://multimp3.vercel.app/api/download
 ```
 
 ### JavaScript

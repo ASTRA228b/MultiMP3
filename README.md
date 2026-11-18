@@ -2,9 +2,13 @@
 
 ![MultiMP3 waveform logo](assets/logo.svg)
 
-**MultiMP3 — A ChudGPT App.** A native Windows workspace for batch audio downloads and an organized MP3 collection.
+**MultiMP3 — A ChudGPT App.** A Windows workspace for batch audio tools and a native Mac organizer for purchased or otherwise owned MP3 collections.
 
 Version **1.3.0** · Windows x64 · MIT source license
+
+## MultiMP3 for Mac
+
+The Mac application focuses on lawful local organization: select purchased or otherwise owned MP3 files, read their embedded metadata with FFprobe, and copy them into album folders without modifying or removing the originals. It does not expose the Windows download workflow. Build it on Apple Silicon with `DOTNET_BIN=/path/to/dotnet ./packaging/Build-Mac.sh`; the signed local bundle is written to `artifacts/mac/MultiMP3.app`.
 
 ## MultiMP3 Web
 

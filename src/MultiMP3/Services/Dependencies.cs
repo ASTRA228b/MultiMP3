@@ -3,13 +3,15 @@ namespace MultiMP3.Services;
 public record Dependencies(string? YtDlp, string? FFmpeg, string? FFprobe, string? Node)
 {
     public bool Ready => YtDlp is not null && FFmpeg is not null && FFprobe is not null && Node is not null;
-    public string Message => Ready ? "Download engine ready · yt-dlp + FFmpeg + Node.js" : "Setup needed: " + string.Join(", ", new[] { YtDlp is null ? "yt-dlp.exe" : null, FFmpeg is null ? "ffmpeg.exe" : null, FFprobe is null ? "ffprobe.exe" : null, Node is null ? "Node.js 22+" : null }.Where(x => x is not null)) + ". Open Settings for setup instructions.";
+    public string Message => Ready ? "Media tools ready · yt-dlp + FFmpeg + Node.js" : "Setup needed: " + string.Join(", ", new[] { YtDlp is null ? "yt-dlp" : null, FFmpeg is null ? "ffmpeg" : null, FFprobe is null ? "ffprobe" : null, Node is null ? "Node.js 22+" : null }.Where(x => x is not null)) + ". Open Settings for setup instructions.";
     public static Dependencies Find()
     {
         string? FindExe(string name)
         {
-            var dirs = new[] { Path.Combine(AppContext.BaseDirectory, "tools"), AppContext.BaseDirectory }.Concat((Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator));
-            return dirs.Select(d => Path.Combine(d, name + ".exe")).FirstOrDefault(File.Exists);
+            string executable = OperatingSystem.IsWindows() ? name + ".exe" : name;
+            var dirs = new[] { Path.Combine(AppContext.BaseDirectory, "tools"), AppContext.BaseDirectory }
+                .Concat((Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator));
+            return dirs.Where(d => !string.IsNullOrWhiteSpace(d)).Select(d => Path.Combine(d, executable)).FirstOrDefault(File.Exists);
         }
         return new(FindExe("yt-dlp"), FindExe("ffmpeg"), FindExe("ffprobe"), FindExe("node"));
     }
